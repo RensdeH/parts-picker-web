@@ -1,10 +1,10 @@
 <?php
 // Start the session
 session_start();
-include 'apifunctions.php';
 ?>
 <html>
 <head>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/lazysizes/4.1.5/lazysizes.min.js" integrity="sha256-I3otyfIRoV0atkNQtZLaP4amnmkQOq0YK5R5RFBd5/0=" crossorigin="anonymous"></script>
 	<link rel="stylesheet" href="style.css" type="text/css">
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -17,7 +17,7 @@ include 'apifunctions.php';
 	<div class="container">
 		<div class="row">
 			<div class="col-8" id="Artikelen">
-				Artikelen worden geladen...
+
 			</div>
 			<div class="col-4">
 				<div class="col input-group-btn" id="orderlijst">
@@ -40,11 +40,48 @@ $(document).ready( function() {
 	$.get("showOrderArtikelen.php",showOrderArtikelenCallback);
 });
 $(document).ready( function() {
-	$("#Artikelen").load("loadArtikels.php");
+	$('#Artikelen').load("loadArtikels.php");
+	$.get("getArtikelen.php",fillTabs);
+	//then fill appropriate tab (JQuery) with article (javascript)
+	//makeTabs();
 });
+
+function fillTabs(dataString,status){
+	function getFotoUrl(artikel){
+
+		if (artikel.images!=undefined){
+				return artikel.images[0].urls.thumb;
+		}
+		return ''
+	}
+	data = JSON.parse(dataString);
+	for (i=0;i<data.length;i++){
+		var artikel = data[i];
+		//optie voor alle categorie
+		var fotoUrl = getFotoUrl(artikel);
+		var imgHtml = "<img class=\"lazyload\" data-src=\""+fotoUrl+"\" style=\"width:100%;height:auto;max-height:80px\">";
+		var html = "<button class=\"btn col-1 border border-success\" style=\"max-width:100px;height:100px\" onclick=productClick("+artikel.id+")>"+imgHtml+"</button>";
+
+		for(j=0;j<artikel.categories.length;j++){
+			var categorie = artikel.categories[j].category_id;
+			var tabs = $('#nav-def-'+categorie);
+			if(tabs.length!=0){
+				//console.log("def bestaat");
+				tabs[0].append(html);
+			}
+			else{
+				//console.log("def bestaat niet");
+				$('#nav-'+categorie).append(html);
+			}
+		}
+	}
+
+}
 
 function showOrderArtikelenCallback(dataString,status){
 	data = JSON.parse(dataString);
+	if (data == null)
+	{return;}
 	console.log(data);
 	for(i=0;i<data.length;i++){
 		newProduct(data[i].id,data[i].count);

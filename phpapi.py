@@ -1,8 +1,16 @@
 
-import os, sys, ast, json
-os.chdir("/home/rens/mx5/api/Parts-Picker")
-sys.path.append('/home/rens/mx5/api/Parts-Picker')
-import api
+import os, sys, json
+os.chdir("/home/rens/code/parts-picker")
+sys.path.append('/home/rens/code/parts-picker')
+import api, utils
+
+def getPHPDictWithItems():
+	artikelen = loadWebshopArtikels()
+	print(json.dumps(getDictWithItems(artikelen)))
+
+def getPHPArticleList():
+	artikelen = loadWebshopArtikels()
+	print(json.dumps(artikelen))
 
 def getStoreDetails():
 	print(json.dumps(api.getStoreDetails()))
@@ -33,3 +41,24 @@ def postArtikel(data):
 
 def patchArtikel(id,data,use_url_id=False,taal='nl_NL'):
 	print(json.dumps(api.patchArtikel(id,data,use_url_id,taal)))
+
+#-------------------------------------------------------
+
+def loadWebshopArtikels(silent=True):
+	webshopLijst = [];
+	webshopProducts = utils.readJson('Resources/Artikelen.json')
+	if webshopProducts == {}:
+		webshopProducts = api.getArtikels(silent=silent)
+		utils.writeJson('Resources/Artikelen.json',webshopProducts)
+	for d in webshopProducts:
+		item = d
+		if item is not None:
+			webshopLijst.append(item)
+	return webshopLijst
+
+def getDictWithItems(webshopLijst):
+	cids = {}
+	for a in webshopLijst:
+		for c in a['categories']:
+			cids.setdefault(str(c['category_id']),[]).append(a)
+	return cids

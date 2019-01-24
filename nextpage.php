@@ -14,6 +14,7 @@ session_start();
 <body>
 	<a class="btn btn-primary" href="artikelen.php" role="button">Vorige</a><br>
 	<br>
+	
 	<div class="col6" id="werkregels">
 	</div>
 	<div class="col-6">

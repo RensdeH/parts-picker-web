@@ -12,6 +12,16 @@ function getProductImage($id){
 	return $fotoUrl;
 }
 
+function getDictWithItems(){
+	#return shell_exec("python -c \"import phpapi; phpapi.getPHPDictWithItems()\"");
+	return json_decode(shell_exec("python -c \"import phpapi; phpapi.getPHPDictWithItems()\""));
+}
+
+function getArticleList(){
+	#return shell_exec("python -c \"import phpapi; phpapi.getPHPDictWithItems()\"");
+	return json_decode(shell_exec("python -c \"import phpapi; phpapi.getPHPArticleList()\""));
+}
+
 function getStoreDetails(){
 	return json_decode(shell_exec("python -c \"import phpapi; phpapi.getStoreDetails()\""));
 }
@@ -28,7 +38,7 @@ function getArtikelCount(){
 	return json_decode(shell_exec("python -c \"import phpapi; phpapi.getArtikelCount()\""));
 }
 function getArtikels($aantal = 0,$silent = False){
-	return json_decode(shell_exec("python -c \"import phpapi; phpapi.getArtikels(aantal=30,silent=True)\""));
+	return json_decode(shell_exec("python -c \"import phpapi; phpapi.getArtikels(aantal=1000,silent=True)\""));
 }
 function getArtikel($id,$use_url_id=False){
 		;//print(json.dumps(api.getArtikel(id,use_url_id)))
