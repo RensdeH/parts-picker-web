@@ -23,7 +23,7 @@ session_start();
 				<div class="col input-group-btn" id="orderlijst">
 				</div>
 				<div class="col input-group-btn" id="bottom">
-					<a class="btn btn-primary btn-block" href="nextpage.php" onclick="saveOrder()" role="button">Sla order op.</a>
+					<a class="btn btn-primary btn-block" href="werk.php" onclick="saveOrder()" role="button">Sla order op.</a>
 					<p></p>
 					<a class="btn btn-danger btn-block" href="index.php" onclick="clearSession()" role="button">Restart</a>
 				</div>
@@ -35,7 +35,7 @@ session_start();
 </html>
 
 <script type="text/javascript">
-
+var dataDict = [];
 $(document).ready( function() {
 	$.get("showOrderArtikelen.php",showOrderArtikelenCallback);
 });
@@ -54,7 +54,12 @@ function fillTabs(dataString,status){
 		}
 		return ''
 	}
-	data = JSON.parse(dataString);
+	console.log(dataString);
+	var data = JSON.parse(dataString);
+	for (i=0;i<data.length;i++){
+		dataDict[data[i].id] = data[i];
+	}
+
 	for (i=0;i<data.length;i++){
 		var artikel = data[i];
 		//optie voor alle categorie
@@ -66,16 +71,13 @@ function fillTabs(dataString,status){
 			var categorie = artikel.categories[j].category_id;
 			var tabs = $('#nav-def-'+categorie);
 			if(tabs.length!=0){
-				//console.log("def bestaat");
 				tabs[0].append(html);
 			}
 			else{
-				//console.log("def bestaat niet");
 				$('#nav-'+categorie).append(html);
 			}
 		}
 	}
-
 }
 
 function showOrderArtikelenCallback(dataString,status){
@@ -99,9 +101,6 @@ function saveOrder(){
 		var count = data[i].innerHTML;
 		var id = data[i].id.split('-')[2];
 		data2.push({id:id,count:count});
-	}
-	for(j = 0;j<data2.length;j++){
-		console.log(data2[j]);
 	}
 	$.post('saveOrder.php',{Artikelen:data2});
 }
@@ -138,17 +137,25 @@ function deleteProduct(id){
 	}
 }
 
+function cleanName(name){
+	name = name.replace("Mazda","");
+	name = name.replace("MX5","");
+	name = name.replace("MX-5","");
+	return name;
+}
+
 function newProduct(id, count = 1){
 	if($('.order-item').length == 0){
 		$('#orderlijst').html('');
 	}
 
+	Productnaam = cleanName(dataDict[id].name);
 	html = "";
 	html += "<div class=\"input-group mb-3\" id=\"product-"+id+"\">";
   html += "<div class=\"input-group-prepend\">";
   html += "  <button class=\"btn btn-danger\" type=\"button\" id=\"button-delete\" onclick=\"deleteProduct("+id+")\">X</button>";
   html += "</div>";
-  html += "<span class=\"input-group-text\" id=\"product-name\">"+id+"</span>";
+  html += "<span class=\"input-group-text\" id=\"product-name\">"+Productnaam+"</span>";
 	html += "<div class=\"input-group-append\">";
 	html += "  <button class=\"btn btn-secondary\" type=\"button\" id=\"button-removeone\" onclick=\"removeProduct("+id+")\">-</button>";
 	html += "  <span class=\"input-group-text order-item\" id=\"text-count-"+id+"\">"+count+"</span>";
@@ -157,7 +164,5 @@ function newProduct(id, count = 1){
 	html += "</div>";
 
 	$("#orderlijst").append(html);
-	//$('#Content').html("<button>Hallo1</button><br><button>Hallo2</button>");
-	//$.post("addProduct.php", product ); //$_SESSION[Artikelen].append(product)
 }
 </script>

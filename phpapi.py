@@ -1,7 +1,8 @@
 
 import os, sys, json
-os.chdir("/home/rens/code/parts-picker")
-sys.path.append('/home/rens/code/parts-picker')
+path = "/home/rens/mx5/api/Parts-Picker"
+os.chdir(path)
+sys.path.append(path)
 import api, utils
 
 def getPHPDictWithItems():
